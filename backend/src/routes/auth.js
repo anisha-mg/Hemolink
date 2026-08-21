@@ -336,6 +336,15 @@ router.put('/availability', authenticateToken, async (req, res) => {
 // POST /api/auth/switch-role - Toggle role between donor and requester
 router.post('/switch-role', authenticateToken, async (req, res) => {
   try {
+    // Ensure user record exists in database
+    const userCheck = await db.query(`SELECT * FROM users WHERE id = $1`, [req.user.id]);
+    if (userCheck.rows.length === 0) {
+      await db.query(
+        `INSERT INTO users (id, email, phone, password_hash, role) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO NOTHING`,
+        [req.user.id, req.user.email || `user_${req.user.id}@hemolink.org`, '9876543210', 'hash', req.user.role || 'donor']
+      );
+    }
+
     const userRes = await db.query(`SELECT * FROM users WHERE id = $1`, [req.user.id]);
     if (userRes.rows.length === 0) {
       return res.status(404).json({ success: false, message: 'User not found' });
