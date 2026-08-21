@@ -27,6 +27,20 @@ const io = new Server(httpServer, {
 app.use(cors());
 app.use(express.json());
 
+// Auto-initialize DB on Vercel Serverless Function Invocation
+let isDbInitialized = false;
+app.use(async (req, res, next) => {
+  if (!isDbInitialized) {
+    try {
+      await initDB();
+      isDbInitialized = true;
+    } catch (err) {
+      console.error('DB init error:', err);
+    }
+  }
+  next();
+});
+
 // Pass Socket.IO instance to Express app
 app.set('io', io);
 
@@ -59,17 +73,20 @@ app.use((err, req, res, next) => {
   });
 });
 
+export default app;
+
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
   try {
     await initDB();
-    httpServer.listen(PORT, () => {
-      console.log(`🚀 HemoLink server running on http://localhost:${PORT}`);
-    });
+    if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+      httpServer.listen(PORT, () => {
+        console.log(`🚀 HemoLink server running on http://localhost:${PORT}`);
+      });
+    }
   } catch (err) {
     console.error('Failed to start HemoLink server:', err);
-    process.exit(1);
   }
 }
 
