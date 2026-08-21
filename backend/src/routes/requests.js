@@ -25,6 +25,15 @@ router.post('/', authenticateToken, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Missing required request parameters' });
     }
 
+    // Ensure user record exists in database
+    const userCheck = await db.query(`SELECT id FROM users WHERE id = $1`, [req.user.id]);
+    if (userCheck.rows.length === 0) {
+      await db.query(
+        `INSERT INTO users (id, email, phone, password_hash, role) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO NOTHING`,
+        [req.user.id, req.user.email || `user_${req.user.id}@hemolink.org`, '9876543210', 'hash', req.user.role || 'requester']
+      );
+    }
+
     // Insert blood request into PostgreSQL
     const reqRes = await db.query(
       `INSERT INTO blood_requests 
