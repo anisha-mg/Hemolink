@@ -1,0 +1,22 @@
+{
+  "name": "hemolink-server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.5",
+    "@electric-sql/pglite-postgis": "^0.2.5",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase-admin": "^14.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^9.0.5",
+    "socket.io": "^4.8.1"
+  }
+}
