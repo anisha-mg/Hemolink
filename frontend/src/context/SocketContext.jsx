@@ -39,7 +39,7 @@ export function SocketProvider({ children }) {
 
     fetchNotifications();
 
-    const socketUrl = window.location.protocol + '//' + window.location.hostname + ':5000';
+    const socketUrl = import.meta.env.VITE_API_URL || (window.location.protocol + '//' + window.location.hostname + ':5000');
     const newSocket = io(socketUrl, {
       auth: { token },
       transports: ['websocket', 'polling']

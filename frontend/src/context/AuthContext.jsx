@@ -10,6 +10,11 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('hemolink_token') || null);
   const [loading, setLoading] = useState(true);
 
+  // Set production backend URL if configured
+  if (import.meta.env.VITE_API_URL) {
+    axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+  }
+
   // Set default axios header
   if (token) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
